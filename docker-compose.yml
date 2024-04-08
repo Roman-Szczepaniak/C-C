@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  db:
+    image: postgres
+    container_name: bd_cac
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: bd11
+      POSTGRES_PASSWORD: bd11
+      POSTGRES_DB: cac
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_cac
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: roman.szczepaniak.auditeur@lecnam.net
+      PGADMIN_DEFAULT_PASSWORD: CandC
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  local_pgdata:
+  pgadmin-data:

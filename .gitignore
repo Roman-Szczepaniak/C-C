@@ -1,0 +1,12 @@
+vendor
+.vscode
+.vs
+.idea
+tmp
+
+# dependencies
+web/node_modules
+
+# misc
+.env*
+/vendor
