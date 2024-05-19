@@ -9,7 +9,6 @@ services:
     environment:
       POSTGRES_USER: bd11
       POSTGRES_PASSWORD: bd11
-      POSTGRES_DB: cac
     volumes:
       - local_pgdata:/var/lib/postgresql/data
   pgadmin:

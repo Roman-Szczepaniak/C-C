@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Roman-Szczepaniak/C-C/internal/controllers"
 	"github.com/Roman-Szczepaniak/C-C/internal/handlers"
 	"github.com/Roman-Szczepaniak/C-C/internal/models"
+	"github.com/Roman-Szczepaniak/C-C/internal/routes"
 	"github.com/Roman-Szczepaniak/C-C/pkg/database"
+	"github.com/gin-gonic/gin"
 )
 
 const port = ":8080"
@@ -14,6 +17,7 @@ const port = ":8080"
 func main() {
 	// Connection with the database in DBeaver
 	database.ConnectDatabase()
+	// Auto-migration des modèles
 	database.DB.AutoMigrate(
 		&models.User{},
 		&models.Party{},
@@ -25,25 +29,25 @@ func main() {
 		&models.Appear{},
 	)
 
-	/*
-		router := gin.New()
-		routes.UserRoutes(router)
-		routes.AuthRoutes(router)
-		routes.EncounterRoutes(router)
-		routes.MonsterRoutes(router)
-		routes.PlayerRoutes(router)
-		routes.AccountRoutes(router)
-		routes.PartyRoutes(router)
+	// Initialisation du routeur Gin
+	router := gin.Default()
+	uc := controllers.NewUserController(database.DB)
 
-		router.GET("/api-1", func(c *gin.Context) {
-			c.JSON(200, gin.H{"success": "Access granted for api-1"})
-		})
+	routes.UserRoutes(router, uc)
+	routes.AuthRoutes(router, uc)
+	// routes.EncounterRoutes(router)
+	// routes.MonsterRoutes(router)
+	// routes.PlayerRoutes(router)
+	// routes.PartyRoutes(router)
 
-		router.GET("/api-2", func(c *gin.Context) {
-			c.JSON(200, gin.H{"success": "Access granted for api-2"})
-		})
-		router.Run(":" + port)
-	*/
+	router.GET("/api-1", func(c *gin.Context) {
+		c.JSON(200, gin.H{"success": "Access granted for api-1"})
+	})
+
+	router.GET("/api-2", func(c *gin.Context) {
+		c.JSON(200, gin.H{"success": "Access granted for api-2"})
+	})
+	router.Run(port)
 
 	http.HandleFunc("/", handlers.Home)
 	http.HandleFunc("/about", handlers.About)

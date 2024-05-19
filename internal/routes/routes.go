@@ -2,22 +2,21 @@ package routes
 
 import (
 	"github.com/Roman-Szczepaniak/C-C/internal/controllers"
+	"github.com/Roman-Szczepaniak/C-C/internal/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func UserRoutes(incomingRoutes *gin.Engine, uc *controllers.UserController) {
 	incomingRoutes.POST("users/signup", uc.Signup)
 	incomingRoutes.POST("users/login", uc.Login)
+}
+
+func AuthRoutes(incomingRoutes *gin.Engine, uc *controllers.UserController) {
+	incomingRoutes.Use(middleware.Authenticate())
 	incomingRoutes.GET("/users", uc.GetUsers)
 	incomingRoutes.GET("/users/:id", uc.GetUserByID)
 	incomingRoutes.PUT("/users/:id", uc.UpdateUser)
 	incomingRoutes.DELETE("/users/:id", uc.DeleteUser)
-}
-
-func AuthRoutes(incomingRoutes *gin.Engine) {
-	incomingRoutes.Use(middleware.UserAuthenticate())
-	incomingRoutes.GET("/usersdata", controller.GetUsers())
-	incomingRoutes.GET("/users/:user_id", controller.GetUser())
 }
 
 func EncounterRoutes(incomingRoutes *gin.Engine, ec *controllers.EncounterController) {

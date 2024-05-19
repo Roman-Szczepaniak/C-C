@@ -1,16 +1,16 @@
 package models
 
 type Card struct {
-	ID           uint `gorm:"primaryKey"`
-	Description  *string
-	CA           *uint
-	PV           *uint
-	Speed        *string
-	Action       *string
-	Strength     string
-	Dexterity    string
-	Constitution string
-	Intelligence string
-	Wisdom       string
-	Charisma     string
+	ID           uint    `gorm:"primaryKey" json:"id"`
+	Description  *string `json:"description"`
+	CA           *uint   `json:"ca"`
+	PV           *uint   `json:"pv"`
+	Speed        *string `json:"speed"`
+	Action       *string `json:"action"`
+	Strength     string  `json:"strength"`
+	Dexterity    string  `json:"dexterity"`
+	Constitution string  `json:"constitution"`
+	Intelligence string  `json:"intelligence"`
+	Wisdom       string  `json:"wisdom"`
+	Charisma     string  `json:"charisma"`
 }
