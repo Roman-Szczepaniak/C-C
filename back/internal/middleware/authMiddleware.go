@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/Roman-Szczepaniak/C-C/internal/helpers"
+	"github.com/Roman-Szczepaniak/C-C/back/internal/helpers"
 	"github.com/gin-gonic/gin"
 )
 
