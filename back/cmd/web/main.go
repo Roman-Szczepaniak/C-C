@@ -32,13 +32,19 @@ func main() {
 	// Initialisation du routeur Gin
 	router := gin.Default()
 	uc := controllers.NewUserController(database.DB)
+	mc := controllers.NewMonsterController(database.DB)
+	ec := controllers.NewEncounterController(database.DB)
+	plc := controllers.NewPlayerController(database.DB)
+	prc := controllers.NewPartyController(database.DB)
+	cc := controllers.NewCardController(database.DB)
 
 	routes.UserRoutes(router, uc)
 	routes.AuthRoutes(router, uc)
-	// routes.EncounterRoutes(router)
-	// routes.MonsterRoutes(router)
-	// routes.PlayerRoutes(router)
-	// routes.PartyRoutes(router)
+	routes.EncounterRoutes(router, ec)
+	routes.MonsterRoutes(router, mc)
+	routes.PlayerRoutes(router, plc)
+	routes.PartyRoutes(router, prc)
+	routes.CardRoutes(router, cc)
 
 	router.GET("/api-1", func(c *gin.Context) {
 		c.JSON(200, gin.H{"success": "Access granted for api-1"})

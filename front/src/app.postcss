@@ -3,6 +3,19 @@
 @tailwind components;
 @tailwind utilities;
 
-select:disabled {
-    @apply cursor-not-allowed;
+select {
+	@apply disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.svelte-select.disabled input {
+	@apply !cursor-not-allowed !opacity-50;
+}
+
+.svelecte.svelecte-control {
+	z-index: 29;
+}
+
+/* Hack table inside accordion */
+.no-padding > h2 + div > div {
+	padding: 0;
 }
