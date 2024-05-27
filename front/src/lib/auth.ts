@@ -1,8 +1,11 @@
 import { goto } from '$app/navigation';
 import { post } from '$lib/api';
 
-export const login = async (username: string, password: string) => {
-	const response = await post('/users/login', new URLSearchParams({ username, password }));
+export const login = async (email: string, hashpassword: string) => {
+	const response = await post('/users/login', {
+		email: email,
+		hashpassword: hashpassword
+	});
 
 	localStorage.setItem('access_token', response['access_token']);
 	localStorage.setItem('refresh_token', response['refresh_token']);

@@ -1,38 +1,53 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-  import { onMount } from 'svelte';
-  import { page } from '$app/stores';
+	import { login } from '$lib/auth';
+	import { Button, Card, FloatingLabelInput, Spinner } from 'flowbite-svelte';
 
-  let email = '';
-  let password = '';
-  let error = '';
+	let email: string, hashpassword: string;
+	let loading = false;
+	let color: any = 'base';
 
-  async function login() {
-      try {
-          const response = await fetch('http://localhost:8080/users/login', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, password })
-          });
-
-          if (!response.ok) {
-              throw new Error('Login failed');
-          }
-
-          const user = await response.json();
-          sessionStorage.setItem('access_token', user.token);
-          goto('/');
-      } catch (err) {
-          error = err.message;
-      }
-  }
+	async function submit() {
+		loading = true;
+		try {
+			await login(email, hashpassword);
+		} catch (error) {
+			color = 'red';
+		}
+		loading = false;
+	}
 </script>
 
-<form on:submit|preventDefault={login}>
-  <input type="email" bind:value={email} placeholder="Email" required />
-  <input type="password" bind:value={password} placeholder="Password" required />
-  <button type="submit">Login</button>
-  {#if error}
-      <p>{error}</p>
-  {/if}
-</form>
+<div class="grid h-screen place-items-center">
+	<Card>
+		<form on:submit|preventDefault={submit} method="POST" class="flex flex-col space-y-6">
+			<h1 class="text-2xl font-bold">Welcome to CraftNCombat!</h1>
+			<div>
+				<FloatingLabelInput
+					{color}
+					id="email"
+					name="email"
+					type="text"
+					label="Email"
+					required
+					bind:value={email}
+				/>
+			</div>
+			<div>
+				<FloatingLabelInput
+					{color}
+					id="hashpassword"
+					name="hashpassword"
+					type="password"
+					label="Hashpassword"
+					required
+					bind:value={hashpassword}
+				/>
+			</div>
+
+			<Button type="submit" class="w-full" disabled={loading}>
+				{#if loading}<Spinner class="mr-3" size="4" color="white" />{/if}
+				Login
+			</Button>
+		</form>
+	</Card>
+</div>
