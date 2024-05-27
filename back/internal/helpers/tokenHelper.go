@@ -1,22 +1,21 @@
 package helpers
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"github.com/Roman-Szczepaniak/C-C/back/internal/models"
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 )
 
 // SignedDetails contient les détails signés
 type SignedDetails struct {
-	Email              string
-	FirstName          string
-	LastName           string
-	jwt.StandardClaims // Incorporation de la structure StandardClaims de jwt-go pour les informations de base sur le token
+	Email     string
+	FirstName string
+	LastName  string
+	jwt.RegisteredClaims
 }
 
 // Clé secrète utilisée pour signer les tokens JWT.
@@ -29,28 +28,32 @@ func GenerateAllTokens(email string, firstName string, lastName string) (signedT
 		Email:     email,
 		FirstName: firstName,
 		LastName:  lastName,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	}
 
 	// Création des claims pour le token de rafraîchissement
 	refreshClaims := &SignedDetails{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(168)).Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(168 * time.Hour)),
 		},
 	}
 
 	// Génération des tokens JWT signés
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(SECRET_KEY))
-	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(SECRET_KEY))
-
 	if err != nil {
 		log.Panic(err)
 		return
 	}
 
-	return token, refreshToken, err
+	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(SECRET_KEY))
+	if err != nil {
+		log.Panic(err)
+		return
+	}
+
+	return token, refreshToken, nil
 }
 
 // ValidateToken valide le token
@@ -69,18 +72,17 @@ func ValidateToken(signedToken string) (claims *SignedDetails, msg string) {
 	}
 
 	claims, ok := token.Claims.(*SignedDetails)
-	if !ok {
-		msg = fmt.Sprintf("le token est invalide")
-		msg = err.Error()
+	if !ok || !token.Valid {
+		msg = "le token est invalide"
 		return
 	}
 
-	if claims.StandardClaims.ExpiresAt < time.Now().Local().Unix() {
-		msg = fmt.Sprintf("le token a expiré")
-		msg = err.Error()
+	if claims.ExpiresAt.Before(time.Now()) {
+		msg = "le token a expiré"
 		return
 	}
-	return claims, msg
+
+	return claims, ""
 }
 
 // UpdateAllTokens met à jour les tokens

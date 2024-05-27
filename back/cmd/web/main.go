@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/Roman-Szczepaniak/C-C/back/internal/controllers"
 	"github.com/Roman-Szczepaniak/C-C/back/internal/handlers"
 	"github.com/Roman-Szczepaniak/C-C/back/internal/models"
 	"github.com/Roman-Szczepaniak/C-C/back/internal/routes"
 	"github.com/Roman-Szczepaniak/C-C/back/pkg/database"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,6 +33,15 @@ func main() {
 
 	// Initialisation du routeur Gin
 	router := gin.Default()
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
 	uc := controllers.NewUserController(database.DB)
 	mc := controllers.NewMonsterController(database.DB)
 	ec := controllers.NewEncounterController(database.DB)
