@@ -2,7 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { PUBLIC_API_URL } from '$env/static/public';
-import jwt_decode, { type JwtPayload } from 'jwt-decode';
+import { jwtDecode, type JwtPayload } from "jwt-decode";
 import * as notifications from '$lib/notifications';
 
 export function formDataToJson(formData: FormData): Record<string, FormDataEntryValue | any> {
@@ -61,7 +61,7 @@ async function send({
 			const access_token = localStorage.getItem('access_token');
 			if (!access_token) throw redirect(307, '/login');
 
-			const decoded_token: JwtPayload = jwt_decode(access_token);
+			const decoded_token: JwtPayload = jwtDecode(access_token);
 			if (!decoded_token.exp) throw redirect(307, '/login');
 			const expiresAt = new Date(decoded_token.exp * 1000);
 			if (expiresAt < new Date()) {
