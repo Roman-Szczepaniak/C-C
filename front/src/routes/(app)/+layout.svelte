@@ -8,7 +8,6 @@
 		  	DropdownHeader,
 		   	DropdownItem,
 		    Hr,
-			NavBrand,
 			Tooltip,
 			Sidebar,
 			SidebarGroup,
@@ -78,8 +77,8 @@
         <div class={!hidden ? 'lg:!block-hidden' : 'lg:!block'}>
             {#if hidden}
                 <Tooltip class="z-30" placement="right" triggeredBy="[href='/monsters']">Monsters</Tooltip>
-                <Tooltip class="z-30" placement="right" triggeredBy="[href='/generator']">Generator</Tooltip>
-                <Tooltip class="z-30" placement="right" triggeredBy="[href='/profil']">Profile</Tooltip>
+                <Tooltip class="z-30" placement="right" triggeredBy="[href='/encounters']">Encounters</Tooltip>
+                <Tooltip class="z-30" placement="right" triggeredBy="[href='/user']">Profil</Tooltip>
             {/if}
             <Sidebar
                 class="{!hidden ? 'w-64' : '!w-16'} flex fixed top-0 left-0 flex-col flex-shrink-0 pt-16 h-full duration-75 border-r border-gray-200 lg:flex transition-[width] dark:border-gray-700">
@@ -96,18 +95,18 @@
                         </SidebarItem>
                         <SidebarItem
                             spanClass="ml-3 {hidden ? '!hidden' : '!block'}"
-                            href="/generator"
-                            active={$page.url.pathname === '/generator'}
-                            label="Generator">
+                            href="/encounters"
+                            active={$page.url.pathname === '/encounters'}
+                            label="Encounters">
                             <svelte:fragment slot="icon">
                                 <!-- Add your generator icon here -->
                             </svelte:fragment>
                         </SidebarItem>
                         <SidebarItem
                             spanClass="ml-3 {hidden ? '!hidden' : '!block'}"
-                            href="/profil"
-                            active={$page.url.pathname === '/profil'}
-                            label="Profile">
+                            href="/user"
+                            active={$page.url.pathname === '/user'}
+                            label="Profil">
                             <svelte:fragment slot="icon">
                                 <!-- Add your profile icon here -->
 							</svelte:fragment>
