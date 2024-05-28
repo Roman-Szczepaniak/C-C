@@ -5,7 +5,7 @@ type Monster struct {
 	Name      string  `json:"name"`
 	Alignment *string `json:"alignment"`
 	Size      string  `json:"size"`
-	Type      string  `json:"typz"`
+	Type      string  `json:"type"`
 	CR        string  `json:"cr"`
-	MonsterID uint    `json:"monster_id"`
+	CardID    uint    `json:"card_id"`
 }

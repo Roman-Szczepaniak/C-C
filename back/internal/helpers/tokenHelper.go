@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"log"
-	"os"
 	"time"
 
 	"github.com/Roman-Szczepaniak/C-C/back/internal/models"
@@ -19,7 +18,7 @@ type SignedDetails struct {
 }
 
 // Clé secrète utilisée pour signer les tokens JWT.
-var SECRET_KEY string = os.Getenv("SECRET_KEY")
+var SECRET_KEY string = "f6Mk_RirJVfMd0SoC01hII2WlorCxUZlrEA-DuMPIxg"
 
 // GenerateAllTokens génère un jeton d'accès et un jeton de rafraîchissement
 func GenerateAllTokens(email string, firstName string, lastName string) (signedToken string, signedRefreshToken string, err error) {

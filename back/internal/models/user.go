@@ -7,8 +7,8 @@ import (
 type User struct {
 	ID           uint      `gorm:"primaryKey" json:"id"`
 	Email        string    `gorm:"uniqueIndex" json:"email"`
-	FirstName    string    `json:"first_name"`
-	LastName     string    `json:"last_name"`
+	FirstName    string    `json:"firstname" validate:"required,min=2,max=100"`
+	LastName     string    `json:"lastname" validate:"required,min=2,max=100"`
 	HashPassword string    `json:"-"`
 	Token        *string   `json:"token"`
 	RefreshToken *string   `json:"refresh_token"`

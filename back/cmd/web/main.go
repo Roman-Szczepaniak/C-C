@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -19,6 +20,16 @@ const port = ":8080"
 func main() {
 	// Connection with the database in DBeaver
 	database.ConnectDatabase()
+	database.DB.Migrator().DropTable(
+		&models.User{},
+		&models.Party{},
+		&models.Card{},
+		&models.History{},
+		&models.Player{},
+		&models.Monster{},
+		&models.Encounter{},
+		&models.Appear{},
+	)
 	// Auto-migration des modèles
 	database.DB.AutoMigrate(
 		&models.User{},
@@ -30,6 +41,8 @@ func main() {
 		&models.Encounter{},
 		&models.Appear{},
 	)
+
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	// Initialisation du routeur Gin
 	router := gin.Default()
