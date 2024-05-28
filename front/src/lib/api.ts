@@ -31,6 +31,7 @@ async function send({
 		headers: new Headers(options?.headers)
 	};
 
+	// Vérification des données à envoyer avec la requête et choisi le type de données
 	if (data) {
 		if (data instanceof URLSearchParams) {
 			opts.headers.set('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
@@ -44,25 +45,30 @@ async function send({
 		}
 	}
 
+	// Vérification de l'absence ou non d'un token d'accès. Si oui ajoute dans header
 	if (localStorage.getItem('access_token')) {
 		opts.headers.set('Authorization', `Bearer ${localStorage.getItem('access_token')}`);
 	}
 
 	try {
 		let timeoutId;
+		// Vérification d'une limite de temps définie pour la requête.
 		if (options?.timeout) {
 			const controller = new AbortController();
 			timeoutId = setTimeout(() => controller.abort(), options.timeout);
 			opts.signal = controller.signal;
 		}
+		// Requête HTTP
 		const res = await fetch(new URL(path, PUBLIC_API_URL), opts);
 		if (timeoutId) clearTimeout(timeoutId);
 		if (res.status === 401) {
 			const access_token = localStorage.getItem('access_token');
 			if (!access_token) throw redirect(307, '/login');
 
+			// Decode le JWT
 			const decoded_token: JwtPayload = jwtDecode(access_token);
 			if (!decoded_token.exp) throw redirect(307, '/login');
+			// Maj de l'expiration du token
 			const expiresAt = new Date(decoded_token.exp * 1000);
 			if (expiresAt < new Date()) {
 				const refresh_token = localStorage['refresh_token'];
@@ -93,9 +99,8 @@ async function send({
 
 		throw error(res.status);
 	} catch (exception: any) {
-		// Properly forward redirection
+		// Gestion de la redirection en cas d'erreur
 		if ('status' in exception && 'location' in exception && exception.status === 307) {
-			// redirect didn't work client side, use goto
 			if (browser) {
 				return goto(exception.location);
 			}
