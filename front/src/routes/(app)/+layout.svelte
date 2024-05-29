@@ -1,5 +1,6 @@
 <script lang="ts">
     import '../../app.postcss';
+    import type { PageData } from './$types';
     import { onMount } from 'svelte';
     import { 
 			Avatar,
@@ -17,6 +18,8 @@
     import { page } from '$app/stores';
     import { logout } from '$lib/auth';
     import { darkMode } from '$lib/stores';
+
+    export let data: PageData;
 
     onMount(() => {
         $darkMode = document.body.parentElement.className === 'dark';
@@ -78,7 +81,7 @@
             {#if hidden}
                 <Tooltip class="z-30" placement="right" triggeredBy="[href='/monsters']">Monsters</Tooltip>
                 <Tooltip class="z-30" placement="right" triggeredBy="[href='/encounters']">Encounters</Tooltip>
-                <Tooltip class="z-30" placement="right" triggeredBy="[href='/user']">Profil</Tooltip>
+                <Tooltip class="z-30" placement="right" triggeredBy="[href='/profile']">Profile</Tooltip>
             {/if}
             <Sidebar
                 class="{!hidden ? 'w-64' : '!w-16'} flex fixed top-0 left-0 flex-col flex-shrink-0 pt-16 h-full duration-75 border-r border-gray-200 lg:flex transition-[width] dark:border-gray-700">
@@ -89,27 +92,18 @@
                             href="/monsters"
                             active={$page.url.pathname === '/monsters'}
                             label="Monsters">
-                            <svelte:fragment slot="icon">
-                                <!-- Add your monster icon here -->
-                            </svelte:fragment>
                         </SidebarItem>
                         <SidebarItem
                             spanClass="ml-3 {hidden ? '!hidden' : '!block'}"
                             href="/encounters"
                             active={$page.url.pathname === '/encounters'}
                             label="Encounters">
-                            <svelte:fragment slot="icon">
-                                <!-- Add your generator icon here -->
-                            </svelte:fragment>
                         </SidebarItem>
                         <SidebarItem
                             spanClass="ml-3 {hidden ? '!hidden' : '!block'}"
-                            href="/user"
-                            active={$page.url.pathname === '/user'}
-                            label="Profil">
-                            <svelte:fragment slot="icon">
-                                <!-- Add your profile icon here -->
-							</svelte:fragment>
+                            href="/profile"
+                            active={$page.url.pathname === `/profile`}
+                            label="Profile">
                         </SidebarItem>
                         <Hr />
                         <DarkMode />

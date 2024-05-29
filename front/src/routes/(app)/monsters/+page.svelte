@@ -1,14 +1,9 @@
 <script lang="ts">
-	import type { PageData } from '../monster/$types';
 	import {
-		Accordion,
-		AccordionItem,
-		Alert,
 		Breadcrumb,
 		BreadcrumbItem,
 		Button,
-		Input,
-		Modal,
+		Select,
 		Table,
 		TableBody,
 		TableBodyCell,
@@ -16,58 +11,23 @@
 		TableHead,
 		TableHeadCell
 	} from 'flowbite-svelte';
-	import Key from 'svelte-heros-v2/Key.svelte';
-	import ArrowDownOnSquare from 'svelte-heros-v2/ArrowDownOnSquare.svelte';
+	import ListFetcher from '$lib/components/ListFetcher.svelte';
 	import PencilSquare from 'svelte-heros-v2/PencilSquare.svelte';
-	import Pencil from 'svelte-heros-v2/Pencil.svelte';
-	import Trash from 'svelte-heros-v2/Trash.svelte';
-	import { goto, invalidate } from '$app/navigation';
-	import { get, del, post, put } from '$lib/api';
-	import type { Monster } from '$lib/interfaces.js';
+	import { get } from '$lib/api';
+	import { goto } from '$app/navigation';
 	import * as notification from '$lib/notifications';
 
-	 export let data: PageData;
-
-	/** async function deleteMonster(monster) {
-		const response = await del(`monster/${monster.id}/`);
-		if (response?.detail) {
-			notification.error('The attribute group contains attributes');
-			return;
-		}
-		await invalidate('app:monsters');
-		await goto(`/monsters`);
-	}
-
-	async function saveMonster(monster) {
-		try {
-			let response;
-			if (monster.id === null) {
-				response = await post('monster/', { code: monster.code });
-			} else {
-				response = await put(`monster/${monster.id}/`, { id: monster.id, code: monster.code });
-			}
-
-			if (response?.id) {
-				invalidate('app:monsters');
-			} else if (response) {
-				invalidate('app:monsters');
-			} else {
-				notification.error('Failed to save the group');
-			}
-		} catch (error) {
-			notification.error('An error occurred while saving the group');
-		}
-	}
-
-	async function fetchMonsters(searchParams: URLSearchParams, requestCount: boolean) {
-		const monstersResponse = await get('/monsters', { asResponse: true });
+	async function fetchMonsters(searchParams: URLSearchParams, requestCount: boolean = false) {
+		const monstersResponse = await get(`/monsters?${searchParams.toString()}`, {
+			asResponse: true,
+			headers: { 'x-request-count': requestCount.toString() }
+		});
 		if (monstersResponse.status !== 200) {
 			notification.error('Something wrong!');
 			throw new Error();
 		}
 		return monstersResponse;
 	}
-	let modalDeleteMonster: Monster; **/
 </script>
 
 <div class="p-4">
@@ -75,43 +35,108 @@
         <BreadcrumbItem href="/" home>Dashboard</BreadcrumbItem>
         <BreadcrumbItem>Monsters</BreadcrumbItem>
     </Breadcrumb>
+	<Button size="sm" on:click={() => goto(`/monsters/create`)}>
+		Create
+	</Button>
 
-    <Table slot="data" let:items hoverable>
-        <TableHead>
-            <TableHeadCell>Name</TableHeadCell>
-            <TableHeadCell>Alignment</TableHeadCell>
-            <TableHeadCell>Size</TableHeadCell>
-            <TableHeadCell>Type</TableHeadCell>
-            <TableHeadCell>CR</TableHeadCell>
-            <TableHeadCell />
-        </TableHead>
+	<ListFetcher callback={fetchMonsters} paginationTop>
+		<svelte:fragment slot="filters">
+			<Select
+					size="sm"
+					value=""
+					items={[
+						{ name: 'Tiny', value: 'Tiny' },
+						{ name: 'Small', value: 'Small' },
+						{ name: 'Medium', value: 'Medium' },
+						{ name: 'Large', value: 'Large' },
+						{ name: 'Huge', value: 'Huge' }
+					]}
+					name="size"
+					placeholder="Size"
+				/>
+			<Select
+					size="sm"
+					value=""
+					items={[
+						{ name: 'Aberration', value: 'Aberration' },
+						{ name: 'Beast', value: 'Beast' },
+						{ name: 'Celestial', value: 'Celestial' },
+						{ name: 'Dragon', value: 'Dragon' },
+						{ name: 'Undead', value: 'Undead' }
+					]}
+					name="type"
+					placeholder="Type"
+				/>
+			<Select
+					size="sm"
+					value=""
+					items={[
+						{ name: 'Forest', value: 'Forest' },
+						{ name: 'Mountain', value: 'Mountain' },
+						{ name: 'Aquatic', value: 'Aquatic' },
+						{ name: 'Swamp', value: 'Swamp' },
+						{ name: 'Desert', value: 'Desert' }
+					]}
+					name="environment"
+					placeholder="Environment"
+				/>
+			<Select
+					size="sm"
+					value=""
+					items={[
+						{ name: 'Lawful', value: 'Lawful' },
+						{ name: 'Neutral', value: 'Neutral' },
+						{ name: 'Chaotic', value: 'Chaotic' },
+						{ name: 'Unaligned', value: 'Unaligned' }
+					]}
+					name="alignment"
+					placeholder="Alignment"
+				/>
+			<Select
+					size="sm"
+					value=""
+					items={[
+						{ name: 'Ordinary', value: 'Ordinary' },
+						{ name: 'Legendary', value: 'Legendary' }
+					]}
+					name="status"
+					placeholder="Status"
+				/>
+		</svelte:fragment>
 
-        <TableBody>
-            {#if Array.isArray(data.monsters)}
-                {#each data.monsters as monster}
-                    <TableBodyRow>
-                        <TableBodyCell>{monster.name}</TableBodyCell>
-                        <TableBodyCell>{monster.alignment}</TableBodyCell>
-                        <TableBodyCell>{monster.size}</TableBodyCell>
-                        <TableBodyCell>{monster.type}</TableBodyCell>
-                        <TableBodyCell>{monster.cr}</TableBodyCell>
-                        <TableBodyCell>
-                            <div class="flex items-center justify-end gap-x-3">
-                                <Button size="sm" href={`/monster/${monster.id}`}>
-                                    <PencilSquare size="15" />
-                                </Button>
-                            </div>
-                        </TableBodyCell>
-                    </TableBodyRow>
-                {/each}
-            {:else}
-                <TableBodyRow>
-                    <TableBodyCell colspan="6" class="text-center">
-                        No monsters available.
-                    </TableBodyCell>
-                </TableBodyRow>
-            {/if}
-        </TableBody>
-    </Table>
+		<Table id="monsters" slot="data" let:items hoverable>
+			<TableHead>
+				<TableHeadCell>Name</TableHeadCell>
+				<TableHeadCell>Alignment</TableHeadCell>
+				<TableHeadCell>Size</TableHeadCell>
+				<TableHeadCell>Type</TableHeadCell>
+				<TableHeadCell>Environment</TableHeadCell>
+				<TableHeadCell>Status</TableHeadCell>
+				<TableHeadCell>CR</TableHeadCell>
+				<TableHeadCell />
+			</TableHead>
+
+			<TableBody>
+				{#each items as monster (monster.id)}
+					<TableBodyRow>
+						<TableBodyCell>{monster.name}</TableBodyCell>
+						<TableBodyCell>{monster.alignment}</TableBodyCell>
+						<TableBodyCell>{monster.size}</TableBodyCell>
+						<TableBodyCell>{monster.type}</TableBodyCell>
+						<TableBodyCell>{monster.environment}</TableBodyCell>
+						<TableBodyCell>{monster.status}</TableBodyCell>
+						<TableBodyCell>{monster.cr}</TableBodyCell>
+						<TableBodyCell>
+							<div class="flex items-center justify-end gap-x-3">
+								<Button size="sm" href={`/monsters/${monster.id}`}>
+									<PencilSquare size="15" />
+								</Button>
+							</div>
+						</TableBodyCell>
+					</TableBodyRow>
+				{/each}
+			</TableBody>
+		</Table>
+	</ListFetcher>
 </div>
 		

@@ -33,9 +33,11 @@ export interface Monster {
     id: number;
     card_id: number;
     name: string;
-    alignment?: string;
+    alignment: string;
     size: string;
     type: string;
+    environment: string;
+    status: string;
     cr: string;
 }
 
