@@ -47,14 +47,20 @@ func (uc *UserController) GetUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-// GetUserByID récupère un utilisateur par son ID
-func (uc *UserController) GetUserByID(c *gin.Context) {
-	id := c.Param("id")
-	var user models.User
-	if err := uc.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+func (uc *UserController) GetProfile(c *gin.Context) {
+	// Récupère l'email à partir du contexte (ajouté par le middleware d'authentification)
+	email, exists := c.Get("email")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
+
+	var user models.User
+	if err := uc.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+
 	c.JSON(http.StatusOK, user)
 }
 

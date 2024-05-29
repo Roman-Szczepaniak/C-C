@@ -20,16 +20,7 @@ const port = ":8080"
 func main() {
 	// Connection with the database in DBeaver
 	database.ConnectDatabase()
-	database.DB.Migrator().DropTable(
-		&models.User{},
-		&models.Party{},
-		&models.Card{},
-		&models.History{},
-		&models.Player{},
-		&models.Monster{},
-		&models.Encounter{},
-		&models.Appear{},
-	)
+
 	// Auto-migration des modèles
 	database.DB.AutoMigrate(
 		&models.User{},
@@ -49,7 +40,7 @@ func main() {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-Request-Count"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,

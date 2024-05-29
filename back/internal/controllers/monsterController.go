@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Roman-Szczepaniak/C-C/back/internal/models"
 	"github.com/gin-gonic/gin"
@@ -18,10 +20,59 @@ func NewMonsterController(db *gorm.DB) *MonsterController {
 
 func (mc *MonsterController) GetMonsters(c *gin.Context) {
 	var monsters []models.Monster
-	if err := mc.DB.Find(&monsters).Error; err != nil {
+	query := mc.DB
+
+	// Ajout des filtres
+	if alignment := c.Query("alignment"); alignment != "" {
+		query = query.Where("LOWER(alignment) = LOWER(?)", alignment)
+	}
+	if size := c.Query("size"); size != "" {
+		query = query.Where("LOWER(size) = LOWER(?)", size)
+	}
+	if monsterType := c.Query("type"); monsterType != "" {
+		query = query.Where("LOWER(type) = LOWER(?)", monsterType)
+	}
+	if environment := c.Query("environment"); environment != "" {
+		query = query.Where("LOWER(environment) = LOWER(?)", environment)
+	}
+	if status := c.Query("status"); status != "" {
+		query = query.Where("LOWER(status) = LOWER(?)", status)
+	}
+
+	// Ajout de la pagination
+	limit := 20 // Default limit
+	if l := c.Query("limit"); l != "" {
+		if lInt, err := strconv.Atoi(l); err == nil {
+			limit = lInt
+		}
+	}
+
+	offset := 0 // Default offset
+	if o := c.Query("offset"); o != "" {
+		if oInt, err := strconv.Atoi(o); err == nil {
+			offset = oInt
+		}
+	}
+
+	// Application de limit et offset à la requête
+	query = query.Limit(limit).Offset(offset)
+
+	// Exécution de la requête
+	if err := query.Find(&monsters).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch monsters"})
 		return
 	}
+
+	// Récupération du nombre total de monstres pour la pagination
+	var total int64
+	mc.DB.Model(&models.Monster{}).Count(&total)
+
+	// Ajout des informations de pagination aux en-têtes de la réponse (optionnel)
+	c.Header("X-Total-Count", fmt.Sprintf("%d", total))
+	c.Header("X-Limit", fmt.Sprintf("%d", limit))
+	c.Header("X-Offset", fmt.Sprintf("%d", offset))
+
+	// Envoi de la réponse avec les monstres
 	c.JSON(http.StatusOK, monsters)
 }
 
