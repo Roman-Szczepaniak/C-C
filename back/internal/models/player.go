@@ -6,8 +6,10 @@ type Player struct {
 	Level      uint   `json:"level"`
 	Initiative *uint  `json:"initiative"`
 	HP         uint   `json:"hp"`
-	HP_max     uint   `json:"hp_max"`
+	HPMax      uint   `json:"hp_max"`
 	XP         *bool  `json:"xp"`
 	UserID     uint   `json:"user_id"`
+	User       User   `gorm:"foreignKey:UserID""`
 	PartyID    uint   `json:"party_id"`
+	Party      Party  `gorm:"foreignKey:PartyID"`
 }

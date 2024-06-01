@@ -18,6 +18,7 @@ func NewMonsterController(db *gorm.DB) *MonsterController {
 	return &MonsterController{DB: db}
 }
 
+// GetMonsters récupère la liste des monstres en fonction des filtres de requête fournis
 func (mc *MonsterController) GetMonsters(c *gin.Context) {
 	var monsters []models.Monster
 	query := mc.DB
@@ -40,14 +41,14 @@ func (mc *MonsterController) GetMonsters(c *gin.Context) {
 	}
 
 	// Ajout de la pagination
-	limit := 20 // Default limit
+	limit := 20 // Limite par défaut
 	if l := c.Query("limit"); l != "" {
 		if lInt, err := strconv.Atoi(l); err == nil {
 			limit = lInt
 		}
 	}
 
-	offset := 0 // Default offset
+	offset := 0 // Décalage par défaut
 	if o := c.Query("offset"); o != "" {
 		if oInt, err := strconv.Atoi(o); err == nil {
 			offset = oInt
@@ -58,7 +59,7 @@ func (mc *MonsterController) GetMonsters(c *gin.Context) {
 	query = query.Limit(limit).Offset(offset)
 
 	// Exécution de la requête
-	if err := query.Find(&monsters).Error; err != nil {
+	if err := query.Preload("Encounters").Preload("Card").Find(&monsters).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch monsters"})
 		return
 	}
@@ -79,39 +80,80 @@ func (mc *MonsterController) GetMonsters(c *gin.Context) {
 func (mc *MonsterController) GetMonsterByID(c *gin.Context) {
 	id := c.Param("id")
 	var monster models.Monster
-	if err := mc.DB.First(&monster, id).Error; err != nil {
+	// Recherche du monstre avec préchargement des relations (encounters et card)
+	if err := mc.DB.Preload("Encounters").Preload("Card").First(&monster, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Monster not found"})
 		return
 	}
 	c.JSON(http.StatusOK, monster)
 }
 
+// CreateMonster crée un nouveau monstre
 func (mc *MonsterController) CreateMonster(c *gin.Context) {
 	var newMonster models.Monster
 	if err := c.BindJSON(&newMonster); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid monster data"})
 		return
 	}
+	// Vérification de l'existence de la carte associée si besoin (un monstre n'a pas forcément de carte)
+	if newMonster.CardID != nil {
+		var card models.Card
+		if err := mc.DB.First(&card, newMonster.CardID).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Card not found"})
+			return
+		}
+	}
+	// Vérifier si les encounters existent avant de créer des liens
+	for _, encounter := range newMonster.Encounters {
+		var existingEncounter models.Encounter
+		if err := mc.DB.First(&existingEncounter, encounter.ID).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Encounter not found"})
+			return
+		}
+	}
+	// Création du monstre
 	if err := mc.DB.Create(&newMonster).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create monster"})
+		return
+	}
+	// Recherche du monstre créé avec préchargement des relations
+	if err := mc.DB.Preload("Encounters").Preload("Card").First(&newMonster, newMonster.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch monster with card"})
 		return
 	}
 	c.JSON(http.StatusCreated, newMonster)
 }
 
+// UpdateMonster met à jour un monstre existant
 func (mc *MonsterController) UpdateMonster(c *gin.Context) {
 	id := c.Param("id")
 	var monster models.Monster
+	// Recherche du monstre à mettre à jour
 	if err := mc.DB.First(&monster, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Monster not found"})
 		return
 	}
+	// Vérification du body/JSON envoyé
 	if err := c.BindJSON(&monster); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid monster data"})
 		return
 	}
+	// Vérifier si les encounters existent avant d'update des liens
+	for _, encounter := range monster.Encounters {
+		var existingEncounter models.Encounter
+		if err := mc.DB.First(&existingEncounter, encounter.ID).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Encounter not found"})
+			return
+		}
+	}
+	// Mise à jour du monstre
 	if err := mc.DB.Save(&monster).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update monster"})
+		return
+	}
+	// Recherche du monstre mis à jour avec préchargement des relations
+	if err := mc.DB.Preload("Encounters").Preload("Card").First(&monster, monster.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch monster with card and encounters"})
 		return
 	}
 	c.JSON(http.StatusOK, monster)
@@ -120,10 +162,22 @@ func (mc *MonsterController) UpdateMonster(c *gin.Context) {
 func (mc *MonsterController) DeleteMonster(c *gin.Context) {
 	id := c.Param("id")
 	var monster models.Monster
-	if err := mc.DB.First(&monster, id).Error; err != nil {
+	// Recherche du monstre à supprimer
+	if err := mc.DB.Preload("Card").First(&monster, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Monster not found"})
 		return
 	}
+	// Impossibilité de supprimer un monstre avec une card associé
+	if monster.CardID != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete monster with associated card"})
+		return
+	}
+	// Supprimer les associations sans supprimer les monsters et les encounters
+	if err := mc.DB.Model(&monster).Association("Encounters").Clear(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete associations"})
+		return
+	}
+	// Suppression du monstre
 	if err := mc.DB.Delete(&monster).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete monster"})
 		return

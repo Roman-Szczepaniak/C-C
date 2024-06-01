@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/Roman-Szczepaniak/C-C/back/internal/helpers"
@@ -25,22 +24,11 @@ func NewUserController(db *gorm.DB) *UserController {
 	return &UserController{DB: db}
 }
 
-// GetUsers récupère tous les utilisateurs avec pagination
+// GetUsers récupère tous les utilisateurs
 func (uc *UserController) GetUsers(c *gin.Context) {
-	// Convertit les paramètres de requête "recordPerPage" et "page" en int
-	recordPerPage, err := strconv.Atoi(c.Query("recordPerPage"))
-	if err != nil || recordPerPage < 1 {
-		recordPerPage = 10
-	}
-
-	page, err := strconv.Atoi(c.Query("page"))
-	if err != nil || page < 1 {
-		page = 1
-	}
-
-	// Récupère les utilisateurs avec pagination
+	// Récupère les utilisateurs
 	var users []models.User
-	if err := uc.DB.Limit(recordPerPage).Offset((page - 1) * recordPerPage).Find(&users).Error; err != nil {
+	if err := uc.DB.Find(&users).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
 		return
 	}
@@ -57,7 +45,7 @@ func (uc *UserController) GetProfile(c *gin.Context) {
 
 	var user models.User
 	if err := uc.DB.Where("email = ?", email).First(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
@@ -125,6 +113,7 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user data"})
 		return
 	}
+	user.UpdatedAt = time.Now()
 	if err := uc.DB.Save(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return

@@ -19,13 +19,22 @@ func AuthRoutes(incomingRoutes *gin.Engine, uc *controllers.UserController) {
 	incomingRoutes.DELETE("/users/:id", uc.DeleteUser)
 }
 
-func EncounterRoutes(incomingRoutes *gin.Engine, ec *controllers.EncounterController) {
+func CardRoutes(incomingRoutes *gin.Engine, cc *controllers.CardController) {
 	incomingRoutes.Use(middleware.Authenticate())
-	incomingRoutes.GET("/encounters", ec.GetEncounters)
-	incomingRoutes.GET("/encounters/:id", ec.GetEncounterByID)
-	incomingRoutes.POST("/encounters", ec.CreateEncounter)
-	incomingRoutes.PUT("/encounters/:id", ec.UpdateEncounter)
-	incomingRoutes.DELETE("/encounters/:id", ec.DeleteEncounter)
+	incomingRoutes.GET("/cards", cc.GetCards)
+	incomingRoutes.GET("/cards/:id", cc.GetCardByID)
+	incomingRoutes.POST("/cards", cc.CreateCard)
+	incomingRoutes.PUT("/cards/:id", cc.UpdateCard)
+	incomingRoutes.DELETE("/cards/:id", cc.DeleteCard)
+}
+
+func ActionRoutes(incomingRoutes *gin.Engine, ac *controllers.ActionController) {
+	incomingRoutes.Use(middleware.Authenticate())
+	incomingRoutes.GET("/actions", ac.GetActions)
+	incomingRoutes.GET("/actions/:id", ac.GetActionByID)
+	incomingRoutes.POST("/actions", ac.CreateAction)
+	incomingRoutes.PUT("/actions/:id", ac.UpdateAction)
+	incomingRoutes.DELETE("/actions/:id", ac.DeleteAction)
 }
 
 func MonsterRoutes(incomingRoutes *gin.Engine, mc *controllers.MonsterController) {
@@ -37,32 +46,35 @@ func MonsterRoutes(incomingRoutes *gin.Engine, mc *controllers.MonsterController
 	incomingRoutes.DELETE("/monsters/:id", mc.DeleteMonster)
 }
 
-func PlayerRoutes(incomingRoutes *gin.Engine, pc *controllers.PlayerController) {
+func PlayerRoutes(incomingRoutes *gin.Engine, plc *controllers.PlayerController) {
 	incomingRoutes.Use(middleware.Authenticate())
-	incomingRoutes.GET("/players", pc.GetPlayers)
-	incomingRoutes.GET("/players/:id", pc.GetPlayerByID)
-	incomingRoutes.POST("/players", pc.CreatePlayer)
-	incomingRoutes.PUT("/players/:id", pc.UpdatePlayer)
-	incomingRoutes.DELETE("/players/:id", pc.DeletePlayer)
+	incomingRoutes.GET("/players", plc.GetPlayers)
+	incomingRoutes.GET("/players/:id", plc.GetPlayerByID)
+	incomingRoutes.POST("/players", plc.CreatePlayer)
+	incomingRoutes.PUT("/players/:id", plc.UpdatePlayer)
+	incomingRoutes.DELETE("/players/:id", plc.DeletePlayer)
 }
 
-func PartyRoutes(incomingRoutes *gin.Engine, pc *controllers.PartyController) {
+func PartyRoutes(incomingRoutes *gin.Engine, ptc *controllers.PartyController) {
 	incomingRoutes.Use(middleware.Authenticate())
-	incomingRoutes.GET("/parties", pc.GetParties)
-	incomingRoutes.GET("/parties/:id", pc.GetPartyByID)
-	incomingRoutes.POST("/parties", pc.CreateParty)
-	incomingRoutes.PUT("/parties/:id", pc.UpdateParty)
-	incomingRoutes.DELETE("/parties/:id", pc.DeleteParty)
+	incomingRoutes.GET("/parties", ptc.GetParties)
+	incomingRoutes.GET("/parties/:id", ptc.GetPartyByID)
+	incomingRoutes.POST("/parties", ptc.CreateParty)
+	incomingRoutes.PUT("/parties/:id", ptc.UpdateParty)
+	incomingRoutes.DELETE("/parties/:id", ptc.DeleteParty)
+}
+
+func EncounterRoutes(incomingRoutes *gin.Engine, ec *controllers.EncounterController) {
+	incomingRoutes.Use(middleware.Authenticate())
+	incomingRoutes.GET("/encounters", ec.GetEncounters)
+	incomingRoutes.GET("/encounters/:id", ec.GetEncounterByID)
+	incomingRoutes.POST("/encounters", ec.CreateEncounter)
+	incomingRoutes.PUT("/encounters/:id", ec.UpdateEncounter)
+	incomingRoutes.DELETE("/encounters/:id", ec.DeleteEncounter)
 }
 
 func HistoryRoutes(incomingRoutes *gin.Engine, hc *controllers.HistoryController) {
 	incomingRoutes.Use(middleware.Authenticate())
 	incomingRoutes.GET("/histories", hc.GetHistories)
 	incomingRoutes.GET("/histories/:id", hc.GetHistoryByID)
-}
-
-func CardRoutes(incomingRoutes *gin.Engine, cc *controllers.CardController) {
-	incomingRoutes.Use(middleware.Authenticate())
-	incomingRoutes.GET("/cards", cc.GetCards)
-	incomingRoutes.GET("/cards/:id", cc.GetCardByID)
 }

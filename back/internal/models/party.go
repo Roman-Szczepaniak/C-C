@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Party struct {
-	ID         uint       `gorm:"primaryKey" json:"id"`
-	Created_at *time.Time `json:"created_at"`
-	Updated_at *time.Time `json:"updated_at"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

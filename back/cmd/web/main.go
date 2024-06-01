@@ -20,17 +20,27 @@ const port = ":8080"
 func main() {
 	// Connection with the database in DBeaver
 	database.ConnectDatabase()
+	// database.DB.Migrator().DropTable(
+	// 	&models.User{},
+	// 	&models.Party{},
+	// 	&models.History{},
+	// 	&models.Card{},
+	// 	&models.Action{},
+	// 	&models.Monster{},
+	// 	&models.Player{},
+	// 	&models.Encounter{},
+	// )
 
 	// Auto-migration des modèles
 	database.DB.AutoMigrate(
 		&models.User{},
 		&models.Party{},
-		&models.Card{},
 		&models.History{},
-		&models.Player{},
+		&models.Card{},
+		&models.Action{},
 		&models.Monster{},
+		&models.Player{},
 		&models.Encounter{},
-		&models.Appear{},
 	)
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -47,19 +57,23 @@ func main() {
 	}))
 
 	uc := controllers.NewUserController(database.DB)
+	cc := controllers.NewCardController(database.DB)
+	ac := controllers.NewActionController(database.DB)
 	mc := controllers.NewMonsterController(database.DB)
-	ec := controllers.NewEncounterController(database.DB)
 	plc := controllers.NewPlayerController(database.DB)
 	prc := controllers.NewPartyController(database.DB)
-	cc := controllers.NewCardController(database.DB)
+	ec := controllers.NewEncounterController(database.DB)
+	hc := controllers.NewHistoryController(database.DB)
 
 	routes.UserRoutes(router, uc)
 	routes.AuthRoutes(router, uc)
-	routes.EncounterRoutes(router, ec)
+	routes.CardRoutes(router, cc)
+	routes.ActionRoutes(router, ac)
 	routes.MonsterRoutes(router, mc)
 	routes.PlayerRoutes(router, plc)
 	routes.PartyRoutes(router, prc)
-	routes.CardRoutes(router, cc)
+	routes.EncounterRoutes(router, ec)
+	routes.HistoryRoutes(router, hc)
 
 	router.GET("/api-1", func(c *gin.Context) {
 		c.JSON(200, gin.H{"success": "Access granted for api-1"})
