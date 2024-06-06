@@ -1,10 +1,20 @@
 import type { PageLoad } from './$types';
 import { get } from '$lib/api';
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params, depends }) => {
+	depends('app:monster');
+	const monsterResponse = await get(`/monsters/${params.monster_id}`);
+	let cardResponse = null;
+
+	if (monsterResponse.card_id) {
+		cardResponse = await get(`/cards/${monsterResponse.card_id}`);
+	}
+
 	return {
 		title: 'Monster',
-        monster: get(`/monsters/${params.monster_id}`)
-        /* Besoin de get card_id */
+		monster: {
+			...monsterResponse,
+			card: cardResponse
+		}
 	};
 }) satisfies PageLoad;

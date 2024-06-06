@@ -31,7 +31,6 @@ export interface Party {
 // Monster interface
 export interface Monster {
     id: number;
-    card_id: number;
     name: string;
     alignment: string;
     size: string;
@@ -39,6 +38,7 @@ export interface Monster {
     environment: string;
     status: string;
     cr: string;
+    card_id?: number;
 }
 
 // Encounter interface
@@ -53,15 +53,27 @@ export interface Encounter {
 // Card interface
 export interface Card {
     id: number;
-    description?: string;
-    ca?: number;
-    pv?: number;
-    speed?: string;
-    action?: string;
+    description: string;
+    ca: number;
+    pv: number;
+    speed: string;
     strength: string;
     dexterity: string;
     constitution: string;
     intelligence: string;
     wisdom: string;
     charisma: string;
+    save_throws?: string;
+    damage_resist?: string;
+    damage_immune?: string;
+    condition_immune?: string;
+    senses?: string;
+    languages?: string;
+}
+
+// Action interface
+export interface Action {
+    id: number;
+    name: string;
+    description: string;
 }
