@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { Heading, Input, Label, Textarea } from 'flowbite-svelte';
-	import { goto } from '$app/navigation';
+	import { Card, Heading, Input, Label, Textarea } from 'flowbite-svelte';
+	import { invalidate } from '$app/navigation';
 	import { del, formDataToJson, post, put } from '$lib/api';
-	import type { Card } from '$lib/interfaces';
+	import type { ICard } from '$lib/interfaces';
 	import * as notification from '$lib/notifications';
 	import SubmitFormButtons from '$lib/components/SubmitFormButtons.svelte';
 
-	export let card: Card = {} as Card;
+	export let card: ICard = {} as ICard;
     export let monster_id: number;
 
 	async function deleteCard() {
@@ -17,7 +17,7 @@
 				return;
 			}
 			notification.success('Card deleted');
-			await goto(`/monsters`);
+			await invalidate('app:monster')
 		} catch (error) {
 			notification.error('An error occurred while deleting the card');
 		}
@@ -56,83 +56,88 @@
 				return;
 			}
 			notification.success('Card created and associated with monster successfully');
-            await goto(`/monsters`);
+            await invalidate('app:monster')
 		}
 	}
 </script>
 
-<form on:submit|preventDefault={(event) => (savePromise = handleSubmit(event))}>
-	{#if card.id}
-		<Heading tag="h3" class="mb-5">Card</Heading>
-	{/if}
-
-	<div class="grid gap-4 mb-6">
-		<Label>
-			Description
-			<Textarea id="description" name="description" rows="3" bind:value={card.description} required />
-		</Label>
-		<Label>
-			CA
-			<Input id="ca" name="ca" type="number" bind:value={card.ca} required />
-		</Label>
-		<Label>
-			PV
-			<Input id="pv" name="pv" type="number" bind:value={card.pv} required />
-		</Label>
-		<Label>
-			Speed
-			<Input id="speed" name="speed" type="text" bind:value={card.speed} required />
-		</Label>
-		<div class="grid grid-cols-6 gap-4">
-			<Label>
-				Strength
-				<Input id="strength" name="strength" type="text" bind:value={card.strength} required />
-			</Label>
-			<Label>
-				Dexterity
-				<Input id="dexterity" name="dexterity" type="text" bind:value={card.dexterity} required />
-			</Label>
-			<Label>
-				Constitution
-				<Input id="constitution" name="constitution" type="text" bind:value={card.constitution} required />
-			</Label>
-			<Label>
-				Intelligence
-				<Input id="intelligence" name="intelligence" type="text" bind:value={card.intelligence} required />
-			</Label>
-			<Label>
-				Wisdom
-				<Input id="wisdom" name="wisdom" type="text" bind:value={card.wisdom} required />
-			</Label>
-			<Label>
-				Charisma
-				<Input id="charisma" name="charisma" type="text" bind:value={card.charisma} required />
-			</Label>
-		</div>
-		<Label>
-			Save Throws
-			<Input id="save_throws" name="save_throws" type="text" bind:value={card.save_throws} />
-		</Label>
-		<Label>
-			Damage Resist
-			<Input id="damage_resist" name="damage_resist" type="text" bind:value={card.damage_resist} />
-		</Label>
-		<Label>
-			Damage Immune
-			<Input id="damage_immune" name="damage_immune" type="text" bind:value={card.damage_immune} />
-		</Label>
-		<Label>
-			Condition Immune
-			<Input id="condition_immune" name="condition_immune" type="text" bind:value={card.condition_immune} />
-		</Label>
-		<Label>
-			Senses
-			<Input id="senses" name="senses" type="text" bind:value={card.senses} />
-		</Label>
-		<Label>
-			Languages
-			<Input id="languages" name="languages" type="text" bind:value={card.languages} />
-		</Label>
-	</div>
-	<SubmitFormButtons bind:loading canDelete={card.id} deleteCallback={deleteCard} />
-</form>
+<Card size="xl">
+    <Heading tag="h2" class="mb-4">
+        {#if card.id}
+            Edit Card
+        {:else}
+            Create Card
+        {/if}
+    </Heading>
+    <form on:submit|preventDefault={(event) => (savePromise = handleSubmit(event))}>
+        <div class="grid gap-4 mb-6">
+            <Label>
+                <span class="text-white">Description</span>
+                <Textarea id="description" name="description" rows="3" bind:value={card.description} required class="mt-1 block w-full" />
+            </Label>
+            <Label>
+                <span class="text-white">CA</span>
+                <Input id="ca" name="ca" type="number" bind:value={card.ca} required class="mt-1 block w-full" />
+            </Label>
+            <Label>
+                <span class="text-white">PV</span>
+                <Input id="pv" name="pv" type="number" bind:value={card.pv} required class="mt-1 block w-full" />
+            </Label>
+            <Label>
+                <span class="text-white">Speed</span>
+                <Input id="speed" name="speed" type="text" bind:value={card.speed} required class="mt-1 block w-full" />
+            </Label>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <Label>
+                    <span class="text-white">Strength</span>
+                    <Input id="strength" name="strength" type="text" bind:value={card.strength} required class="mt-1 block w-full" />
+                </Label>
+                <Label>
+                    <span class="text-white">Dexterity</span>
+                    <Input id="dexterity" name="dexterity" type="text" bind:value={card.dexterity} required class="mt-1 block w-full" />
+                </Label>
+                <Label>
+                    <span class="text-white">Constitution</span>
+                    <Input id="constitution" name="constitution" type="text" bind:value={card.constitution} required class="mt-1 block w-full" />
+                </Label>
+                <Label>
+                    <span class="text-white">Intelligence</span>
+                    <Input id="intelligence" name="intelligence" type="text" bind:value={card.intelligence} required class="mt-1 block w-full" />
+                </Label>
+                <Label>
+                    <span class="text-white">Wisdom</span>
+                    <Input id="wisdom" name="wisdom" type="text" bind:value={card.wisdom} required class="mt-1 block w-full" />
+                </Label>
+                <Label>
+                    <span class="text-white">Charisma</span>
+                    <Input id="charisma" name="charisma" type="text" bind:value={card.charisma} required class="mt-1 block w-full" />
+                </Label>
+            </div>
+            <Label>
+                <span class="text-white">Save Throws</span>
+                <Input id="save_throws" name="save_throws" type="text" bind:value={card.save_throws} class="mt-1 block w-full" />
+            </Label>
+            <Label>
+                <span class="text-white">Damage Resist</span>
+                <Input id="damage_resist" name="damage_resist" type="text" bind:value={card.damage_resist} class="mt-1 block w-full" />
+            </Label>
+            <Label>
+                <span class="text-white">Damage Immune</span>
+                <Input id="damage_immune" name="damage_immune" type="text" bind:value={card.damage_immune} class="mt-1 block w-full" />
+            </Label>
+            <Label>
+                <span class="text-white">Condition Immune</span>
+                <Input id="condition_immune" name="condition_immune" type="text" bind:value={card.condition_immune} class="mt-1 block w-full" />
+            </Label>
+            <Label>
+                <span class="text-white">Senses</span>
+                <Input id="senses" name="senses" type="text" bind:value={card.senses} class="mt-1 block w-full" />
+            </Label>
+            <Label>
+                <span class="text-white">Languages</span>
+                <Input id="languages" name="languages" type="text" bind:value={card.languages} class="mt-1 block w-full" />
+            </Label>
+        </div>
+        <SubmitFormButtons bind:loading canDelete={card.id} deleteCallback={deleteCard} />
+    </form>
+</Card>

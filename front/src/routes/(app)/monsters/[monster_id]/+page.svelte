@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Breadcrumb, BreadcrumbItem } from 'flowbite-svelte';
-	import MonsterForm from '../components/MonsterForm.svelte';
+	import ActionForm from '../components/ActionForm.svelte';
 	import CardForm from '../components/CardForm.svelte';
-	import Box from '$lib/components/Box.svelte';
+	import MonsterForm from '../components/MonsterForm.svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -16,18 +16,21 @@
 
 	<div class="flex flex-row gap-4">
 		<div class="grid grid-cols-1 gap-4 flex-grow">
-			<Box>
-				<MonsterForm bind:monster={data.monster} />
-			</Box>
+			<MonsterForm bind:monster={data.monster} />
 			{#if data.monster.card}
-				<Box>
+				<div class="flex justify-center">
 					<CardForm bind:card={data.monster.card} monster_id={data.monster.id}/>
-				</Box>
+				</div>
+				<div class="flex justify-center wrap">
+					<!-- <ActionForm bind:action={$newAction} card_id={data.monster.card.id} isNew={true} /> à revoir-->
+					{#each data.monster.card.actions as action (action.id)}
+						<ActionForm bind:action={action} />
+					{/each}
+				</div>
 			{:else}
-				<Box>
-					<p>No card associated with this monster. Create one!</p>
+				<div class="flex justify-center">
 					<CardForm monster_id={data.monster.id}/>
-				</Box>
+				</div>
 			{/if}
 		</div>
 	</div>

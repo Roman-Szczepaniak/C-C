@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Heading, Input, Label } from 'flowbite-svelte';
+	import { Card, Heading, Input, Label } from 'flowbite-svelte';
 	import { goto, invalidate } from '$app/navigation';
 	import { del, formDataToJson, post, put } from '$lib/api';
 	import type { Monster } from '$lib/interfaces';
@@ -47,45 +47,47 @@
 				return;
 			}
 			notification.success('Monster created successfully');
-			await goto(`/monsters`);
+			await goto(`/monsters/${createMonster?.id}`);
 		}
 	}
 </script>
 
-<form on:submit|preventDefault={(event) => (savePromise = handleSubmit(event))}>
-	{#if monster.id}
-		<Heading tag="h3" class="mb-5">Monster "{monster.name}"</Heading>
-	{/if}
+<Card size="rounded-lg">
+	<form on:submit|preventDefault={(event) => (savePromise = handleSubmit(event))}>
+		{#if monster.id}
+			<Heading tag="h3" class="mb-5">Monster "{monster.name}"</Heading>
+		{/if}
 
-	<div class="grid gap-4 mb-6">
-		<Label>
-			name
-			<Input id="name" name="name" type="text" bind:value={monster.name} required />
-		</Label>
-		<Label>
-			alignment
-			<Input id="alignment" name="alignment" type="text" bind:value={monster.alignment} required />
-		</Label>
-		<Label>
-			size
-			<Input id="size" name="size" type="text" bind:value={monster.size} required />
-		</Label>
-		<Label>
-			type
-			<Input id="type" name="type" type="text" bind:value={monster.type} required />
-		</Label>
-		<Label>
-			environment
-			<Input id="environment" name="environment" type="text" bind:value={monster.environment} required />
-		</Label>
-		<Label>
-			status
-			<Input id="status" name="status" type="text" bind:value={monster.status} required />
-		</Label>
-		<Label>
-			cr
-			<Input id="cr" name="cr" type="text" bind:value={monster.cr} required />
-		</Label>
-	</div>
-	<SubmitFormButtons bind:loading canDelete={monster.id && monster.card_id === null} deleteCallback={deleteMonster} />
-</form>
+		<div class="grid gap-4 mb-6">
+			<Label>
+				name
+				<Input id="name" name="name" type="text" bind:value={monster.name} required />
+			</Label>
+			<Label>
+				alignment
+				<Input id="alignment" name="alignment" type="text" bind:value={monster.alignment} required />
+			</Label>
+			<Label>
+				size
+				<Input id="size" name="size" type="text" bind:value={monster.size} required />
+			</Label>
+			<Label>
+				type
+				<Input id="type" name="type" type="text" bind:value={monster.type} required />
+			</Label>
+			<Label>
+				environment
+				<Input id="environment" name="environment" type="text" bind:value={monster.environment} required />
+			</Label>
+			<Label>
+				status
+				<Input id="status" name="status" type="text" bind:value={monster.status} required />
+			</Label>
+			<Label>
+				cr
+				<Input id="cr" name="cr" type="text" bind:value={monster.cr} required />
+			</Label>
+		</div>
+		<SubmitFormButtons bind:loading canDelete={monster.id && monster.card_id === null} deleteCallback={deleteMonster} />
+	</form>
+</Card>

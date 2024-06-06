@@ -1,1 +1,0 @@
-<h3 class="mb-4 text-xl font-bold dark:text-white"><slot /></h3>
