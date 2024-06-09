@@ -77,6 +77,10 @@ func (cc *CardController) DeleteCard(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Card not found"})
 		return
 	}
+	if err := cc.DB.Model(&models.Monster{}).Where("card_id = ?", card.ID).Update("card_id", nil).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to dissociate card from monsters"})
+		return
+	}
 	// Supprimer les associations sans supprimer la carte
 	if err := cc.DB.Model(&card).Association("Actions").Clear(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete associations"})

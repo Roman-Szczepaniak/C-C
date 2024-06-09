@@ -1,4 +1,4 @@
-module github.com/Roman-Szczepaniak/C-C
+module github.com/Roman-Szczepaniak/C-C/back
 
 go 1.22
 

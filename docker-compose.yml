@@ -1,30 +1,43 @@
-version: '3.8'
-
+version: "3.8"
 services:
-  back:
-    build:
-      context: ./back
-      dockerfile: Dockerfile
-    volumes:
-      - ./back:/app
-    command: go run main.go
-
-  front:
-    build:
-      context: ./front
-      dockerfile: Dockerfile
-    volumes:
-      - ./front:/app
-    command: npm run dev
-
   db:
-    image: postgres:latest
+    image: postgres
+    container_name: bd_cac
+    restart: always
+    ports:
+      - "5432:5432"
     environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: bd11
+      POSTGRES_PASSWORD: bd11
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - local_pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_cac
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: roman.szczepaniak.auditeur@lecnam.net
+      PGADMIN_DEFAULT_PASSWORD: CandC
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+  maildev:
+    image: maildev/maildev
+    container_name: maildev_cac
+    ports:
+      - "1080:1080" # Web interface
+      - "1025:1025" # SMTP server
+
+  back:
+    build: ./back
+    container_name: back_cac
+    command: go run cmd/web/main.go
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
 
 volumes:
-  db-data:
+  local_pgdata:
+  pgadmin-data:
