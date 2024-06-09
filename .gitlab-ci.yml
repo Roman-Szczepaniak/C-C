@@ -1,0 +1,13 @@
+stages:
+ - build
+
+build_img:
+ stage: build
+ image: docker:stable-dind
+ services:
+  - docker:dind
+ script: 
+  - docker ps
+  - docker build -t helloworld:latest .
+  - docker rm -f helloworld || true 
+  - docker run -d --name helloworld --network gitlab-network -p 8082:80 helloworld:latest
