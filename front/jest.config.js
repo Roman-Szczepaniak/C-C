@@ -1,0 +1,11 @@
+module.exports = {
+    transform: {
+      "^.+\\.svelte$": "svelte-jester",
+      "^.+\\.js$": "babel-jest"
+    },
+    moduleFileExtensions: ["js", "svelte"],
+    setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"],
+    testPathIgnorePatterns: ["node_modules"],
+    bail: false,
+    verbose: true
+  };
