@@ -13,9 +13,9 @@ before_script:
 
 build_back:
   stage: build
-  image: golang:latest
+  image: docker/compose:1.29.2
   services:
-    - docker:stable
+    - docker:19.03.12-dind
   script:
     - echo "Building back"
     - docker-compose build back
@@ -23,15 +23,18 @@ build_back:
 
 test_back:
   stage: test
-  image: golang:latest
+  image: docker/compose:1.29.2
   services:
-    - docker:stable
+    - docker:19.03.12-dind
   script:
     - echo "Running back tests"
     - docker-compose run back go test ./... -v
 
 deploy:
   stage: deploy
+  image: docker/compose:1.29.2
+  services:
+    - docker:19.03.12-dind
   script:
     - echo "Deploying application"
     - docker-compose up -d
