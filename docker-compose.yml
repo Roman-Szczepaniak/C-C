@@ -11,7 +11,6 @@ services:
       POSTGRES_PASSWORD: bd11
     volumes:
       - local_pgdata:/var/lib/postgresql/data
-
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_cac
@@ -23,31 +22,12 @@ services:
       PGADMIN_DEFAULT_PASSWORD: CandC
     volumes:
       - pgadmin-data:/var/lib/pgadmin
-
   maildev:
     image: maildev/maildev
     container_name: maildev_cac
     ports:
-      - "1080:1080"
-      - "1025:1025"
-
-  back:
-    build:
-      context: ./back
-    volumes:
-      - ./back:/app
-    command: go run main.go
-    depends_on:
-      - db
-
-  front:
-    build:
-      context: ./front
-    volumes:
-      - ./front:/app
-    command: npm run dev
-    depends_on:
-      - back
+      - "1080:1080" # Web interface
+      - "1025:1025" # SMTP server
 
 volumes:
   local_pgdata:
