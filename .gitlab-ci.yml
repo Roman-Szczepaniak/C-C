@@ -7,30 +7,25 @@ variables:
   POSTGRES_USER: bd11
   POSTGRES_PASSWORD: bd11
 
-before_script:
-  - curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-  - chmod +x /usr/local/bin/docker-compose
-
 build_back:
   stage: build
   image: golang:latest
-  services:
-    - docker:dind
   script:
     - echo "Building back"
-    - docker build back
+    - docker build -t myapp:latest back
 
 test_back:
   stage: test
   image: golang:latest
-  services:
-    - docker:dind
   script:
     - echo "Running back tests"
-    - docker run back go test ./... -v
+    - docker run myapp go test ./... -v
 
 deploy:
   stage: deploy
+  image: docker:stable-dind
+  services:
+    - docker:dind
   script:
     - echo "Deploying application"
     - docker-compose up -d
