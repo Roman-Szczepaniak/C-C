@@ -9,27 +9,33 @@ variables:
 
 build_back:
   stage: build
-  image: docker:stable-dind
+  image: 
+    - golang:latest
+    - docker:stable-dind
   services:
     - docker:dind
   script:
     - echo "Building back"
-    - docker build -t cnc_app_back:latest -f back/Dockerfile back
+    - docker build -t cnc_app:latest back
+    - docker rm -f cnc_app || true
+    - docker run -d --name cnc_app -p 8081:8080 --network cnc_app cnc_app:latest
 
 test_back:
   stage: test
-  image: docker:stable-dind
+  image: 
+    - golang:latest
+    - docker:stable-dind
   services:
     - docker:dind
   script:
     - echo "Running back tests"
-    - docker run --rm cnc_app_back go test ./... -v
+    - docker run cnc_app go test ./... -v
 
-deploy:
-  stage: deploy
-  image: docker:stable-dind
-  services:
-    - docker:dind
-  script:
-    - echo "Deploying application"
-    - docker compose up -d
+# deploy:
+#   stage: deploy
+#   image: docker:stable-dind
+#   services:
+#     - docker:dind
+#   script:
+#     - echo "Deploying application"
+#     - docker compose up -d
