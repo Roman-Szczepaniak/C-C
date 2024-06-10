@@ -24,4 +24,4 @@ test_back:
     - docker:dind
   script:
     - echo "Running back tests"
-    - docker run cnc_app go test ./... -v
+    - docker run cnc_app_back go test ./... -v
