@@ -11,6 +11,8 @@ services:
       POSTGRES_PASSWORD: bd11
     volumes:
       - local_pgdata:/var/lib/postgresql/data
+    networks:
+      - cnc_app
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_cac
@@ -37,6 +39,11 @@ services:
       - "8081:8080"
     depends_on:
       - db
+    networks:
+      - cnc_app
+
+networks:
+  cnc_app:
 
 volumes:
   local_pgdata:
