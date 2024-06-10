@@ -9,17 +9,21 @@ variables:
 
 build_back:
   stage: build
-  image: golang:latest
+  image: docker:stable-dind
+  services:
+    - docker:dind
   script:
     - echo "Building back"
-    - docker build -t myapp:latest back
+    - docker build -t cnc_app_back:latest -f back/Dockerfile back
 
 test_back:
   stage: test
-  image: golang:latest
+  image: docker:stable-dind
+  services:
+    - docker:dind
   script:
     - echo "Running back tests"
-    - docker run myapp go test ./... -v
+    - docker run --rm cnc_app_back go test ./... -v
 
 deploy:
   stage: deploy
