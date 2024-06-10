@@ -1,7 +1,6 @@
 stages:
   - build
   - test
-  # - deploy
 
 variables:
   POSTGRES_USER: bd11
@@ -30,12 +29,3 @@ test_back:
   script:
     - echo "Running back tests"
     - docker run cnc_app go test ./... -v
-
-# deploy:
-#   stage: deploy
-#   image: docker:stable-dind
-#   services:
-#     - docker:dind
-#   script:
-#     - echo "Deploying application"
-#     - docker compose up -d
