@@ -8,22 +8,18 @@ variables:
 
 build_back:
   stage: build
-  image: 
-    - golang:latest
-    - docker:stable-dind
+  image: docker:stable-dind
   services:
     - docker:dind
   script:
     - echo "Building back"
-    - docker build -t cnc_app:latest back
-    - docker rm -f cnc_app || true
-    - docker run -d --name cnc_app -p 8081:8080 --network cnc_app cnc_app:latest
+    - docker build -t cnc_app_back:latest -f back/Dockerfile back
+    - docker rm -f cnc_app_back || true
+    - docker run -d --name cnc_app_back -p 8081:8080 --network cnc_app cnc_app_back:latest
 
 test_back:
   stage: test
-  image: 
-    - golang:latest
-    - docker:stable-dind
+  image: docker:stable-dind
   services:
     - docker:dind
   script:
